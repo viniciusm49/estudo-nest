@@ -12,8 +12,8 @@ export class UsuarioController {
     constructor(private userRepository: UserRepository,private userService: UserService){}
     @Get('/teste')
     async get(){
-      return this.userService.verificarEmailUnico("teste21@email.com");
-   }
+      return 'apenas uma rota de teste'
+    }
     //Puxar todos os usuarios
     @Get()
     async getAllUsers(){
@@ -23,7 +23,6 @@ export class UsuarioController {
         );
         return listarUserDTO;
     }
-    
     //Criar novo usúario
     @Post()
     async create(@Body() body: CreateUserDTO){
@@ -37,7 +36,7 @@ export class UsuarioController {
     //Atualizar dados do usuário
     @Put(':id')
     async update(@Param('id') id: string, @Body() body: UpdateUserDTO){
-        const userUpdater = await this.userRepository.update(id, body);
+        const userUpdater = await this.userService.update(id, body);
         return userUpdater;
     }
     //Deletar usuário
