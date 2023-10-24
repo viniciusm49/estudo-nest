@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
+   
     constructor(private prisma: PrismaService) { }
     async getAll(params: {
         skip?: number;
@@ -60,6 +61,37 @@ export class UserService {
             return updateUser;
         } catch (error) {
             throw new ConflictException('Email já utilizado!');
+        }
+    }
+    async trocarAtivo(id: string) {
+        const usuarioExiste = await this.user({ id: id });
+        if (!usuarioExiste) {
+            throw new NotFoundException(`Usuario com ${id} não existe`);
+        }
+        const data: Prisma.UserUpdateInput = {ativo:!usuarioExiste.ativo};
+        try {
+            const updateUser = await this.prisma.user.update({
+                where: { id: id },
+                data,
+            });
+            return updateUser;
+        } catch (error) {
+            throw new ConflictException('Email já utilizado!');
+        }
+    }
+    async delete(id: string): Promise<void> {
+        const usuarioExiste = await this.user({ id });
+        
+        if (!usuarioExiste) {
+            throw new NotFoundException(`Usuário com ID ${id} não existe`);
+        }
+
+        try {
+            await this.prisma.user.delete({
+                where: { id },
+            });
+        } catch (error) {
+            throw new Error(`Erro ao excluir usuário com ID ${id}: ${error.message}`);
         }
     }
 }

@@ -19,18 +19,18 @@ export class UsuarioController {
     async getAllUsers(){
         const listaUsers = this.userService.getAll({});
         const listarUserDTO = (await listaUsers).map(
-            user => new ListUserDTO(user.id, user.nome)
+            user => new ListUserDTO(user.id, user.nome, user.email, user.ativo)
         );
         return listarUserDTO;
     }
-    //Criar novo usúario
+    //Criar novo usuario
     @Post()
     async create(@Body() body: CreateUserDTO){
         console.log(body);
-        let user: User = {id: uuid(), nome:body.nome, email:body.email, senha:body.senha};
+        let user: User = {id: uuid(), nome:body.nome, email:body.email, senha:body.senha, ativo:false};
         console.log(user);
         this.userService.create(user);
-        const respostaDTO = new ListUserDTO(user.id, user.nome);
+        const respostaDTO = new ListUserDTO(user.id, user.nome, user.email, user.ativo);
         return respostaDTO;
     }
     //Atualizar dados do usuário
@@ -39,10 +39,15 @@ export class UsuarioController {
         const userUpdater = await this.userService.update(id, body);
         return userUpdater;
     }
+    @Put('/updatestate/:id')
+    async trocarAtivo(@Param('id') id: string){
+        const userUpdater = await this.userService.trocarAtivo(id);
+        return userUpdater;
+    }
     //Deletar usuário
     @Delete(':id')
     async delete(@Param('id') id:string){
-        await this.userRepository.delete(id);
+        await this.userService.delete(id);
         return `Usuário com id ${id} excluído com sucesso!`;
     }
 }
